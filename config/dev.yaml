@@ -1,0 +1,109 @@
+server_port: 8080
+redis_host: redis://
+redis_port: 6379
+#database_host: localhost
+#database_port: 5432
+#database_user: postgres
+#database_password: postgres
+
+database_host: 35.226.223.105
+database_port: 5432
+database_user: postgres
+database_password: password
+
+database_name: jobs
+dispatcher_type: transcode
+transcode_worker_namespace: transcode
+transcode_worker_job_name: transcode
+download_worker_namespace: download
+download_worker_job_name: download
+worker_concurrency: 1
+aws_region:
+aws_access_key:
+aws_secret_key:
+s3_inbound_bucket: enc-inbound
+s3_inbound_region: us-west-1
+s3_outbound_bucket: enc-outbound
+s3_outbound_region: us-west-1
+
+gcs_region: us-central1
+gcs_service_account_path: ./google-cloud.json
+gcs_bucket: dev-experiments
+
+
+work_dir: /mpc
+src_dir: /src
+dest_dir: /dest
+slack_webhook:
+digitalocean_access_token:
+cloudinit_redis_host: localhost
+cloudinit_redis_port: 6379
+cloudinit_database_host: localhost
+cloudinit_database_port: 5432
+cloudinit_database_user: postgres
+cloudinit_database_password: postgres
+cloudinit_database_name: enc
+
+
+profiles:
+  - profile: baseline_mp4
+    output: ".mp4"
+    publish: true
+    options:
+      - "-sn"
+      - "-max_muxing_queue_size 50000"
+      - "-f mp4"
+      - "-acodec aac"
+      - "-ab 96k"
+      - "-ac 2"
+      - "-sws_flags lanczos"
+      - "-vcodec libx264"
+      - "-pix_fmt yuv420p"
+      - "-vb 256k"
+      - "-vf \"scale=min(920\\,iw):trunc(ow/a/2)*2,scale=trunc(oh*a/2)*2:min(524\\,ih)\" "
+      - "-r 24"
+      - "-y"
+
+  - profile: baseline_webm
+    output: ".webm"
+    publish: true
+    options:
+      - "-sn"
+      - "-max_muxing_queue_size 50000"
+      - "-f webm"
+      - "-acodec libvorbis"
+      - "-ac 2"
+      - "-sws_flags lanczos"
+      - "-vcodec libvpx"
+      - "-cpu-used 3"
+      - "-vb 256k"
+      - "-vf \"scale=min(920\\,iw):trunc(ow/a/2)*2,scale=trunc(oh*a/2)*2:min(524\\,ih)\" "
+      - "-r 24"
+      - "-y"
+
+  - profile: baseline_mp3
+    output: ".mp3"
+    publish: true
+    options:
+      - "-sn"
+      - "-max_muxing_queue_size 50000"
+      - "-f mp3"
+      - "-ab 192k"
+      - "-ac 2"
+      " -sws_flags lanczos"
+      - "-y"
+
+  - profile: baseline_wav
+    output: ".wav"
+    publish: true
+    options:
+      - "-vf scale=-2:1080"
+      - "-c:v libx264"
+      - "-profile:v main"
+      - "-level:v 4.2"
+      - "-x264opts scenecut=0:open_gop=0:min-keyint=72:keyint=72"
+      - "-minrate 6000k"
+      - "-maxrate 6000k"
+      - "-bufsize 6000k"
+      - "-b:v 6000k"
+      - "-y"

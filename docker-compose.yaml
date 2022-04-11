@@ -1,0 +1,41 @@
+version: '3'
+services:
+  subscriber:
+    build: .
+    environment:
+      - DATABASE_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    links:
+      - redis
+      - db
+    entrypoint: ["/app", "subscriber"]
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+    volumes:
+      - /var/lib/postgresql/data
+
+  server:
+    build: .
+    environment:
+      - DATABASE_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    links:
+      - redis
+      - db
+    ports:
+      - "8080:8080"
+    entrypoint: ["/app", "server"]
